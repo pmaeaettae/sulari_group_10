@@ -1,3 +1,5 @@
+#pragma once
+
 #define MAX_HP 3
 #define MAX_DEATHS 3
 #define MAX_AMMO 12
