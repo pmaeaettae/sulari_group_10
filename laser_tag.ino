@@ -20,10 +20,10 @@ void loop() {
 
     // mqtt loop needed here!!
 
-    swtich (state) {
+    switch (state) {
 
         case ST_INIT:
-            ST = ST_WAIT_MODE;
+            state = ST_WAIT_MODE;
             break;
 
         case ST_WAIT_MODE:
@@ -45,12 +45,12 @@ void loop() {
             }
             break;
 
-        case ST_GAME_OVER;
+        case ST_GAME_OVER:
             game_over();
             state = ST_WAIT_START;
             break;
 
-        case STATE_DEBUG_
+        case ST_DEBUG:
             debug_mode();
             break;
     }
