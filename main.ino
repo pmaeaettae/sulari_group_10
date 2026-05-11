@@ -1,16 +1,26 @@
+// Developed with the assistance of AI
+
 #include "pins.h"
 #include "defs.h"
+
 #include "display.h"
 #include "gyro.h"
 #include "game.h"
+#include "ir.h"
+#include "wireless.h"
+#include "gpio.h"
 
+// Starts from INIT state
 ty_game_state state = ST_INIT;
 
 void setup () {
     Serial.begin(115200);
 
+    gpio_init();
     display_init();
+    ir_init();
     gyro_init();
+    // wireless_init();
     game_init();
 
 
@@ -19,6 +29,8 @@ void setup () {
 void loop() {
 
     // mqtt loop needed here!!
+
+    status_leds();
 
     switch (state) {
 
@@ -52,6 +64,10 @@ void loop() {
 
         case ST_DEBUG:
             debug_mode();
+            if (!debug_mode_active()) {
+                state = ST_WAIT_MODE;
+            }
             break;
     }
+    delay(10);
 }

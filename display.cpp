@@ -3,6 +3,8 @@
 #include <Adafruit_SSD1306.h>
 #include "display.h"
 
+// Help found from this tutorial by Random Nerd Tutorials: https://randomnerdtutorials.com/guide-for-oled-display-with-arduino/
+
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
 void display_start() {

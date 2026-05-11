@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 #define PIN_TRIGGER 12
 #define PIN_RELOAD 13

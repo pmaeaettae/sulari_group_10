@@ -2,65 +2,61 @@
 #include "defs.h"
 #include "pins.h"
 
-// IR channel for PWM
-#define IR_PWM_CHANNEL 0
-#define IR_FREQUENCY 38000  // 38kHz carrier
-#define IR_DUTY_CYCLE 128   // 50% duty (8-bit resolution)
+// These are se in an interrupt handler => volatile
+volatile int pulse_width = 0;
+volatile int pulse_start_time = 0;
+volatile bool pulse_received = false;
 
-// Initialize IR module
-void initIR() {
+// Interrupt when IR reciever detects a pulse
+void IRAM_ATTR ir_rx_interrupt() {
+    if (digitalRead(PIN_IR_RX) == HIGH) {
+        // Start of pulse
+        pulse_start_time = micros();
+    } else {
+        // End of pulse
+        pulse_width = micros() - pulse_start_time;
+        pulse_received = true;
+    }
+}
+
+// Initializing IR transmitter and reciever
+void ir_init() {
     pinMode(PIN_IR_TX, OUTPUT);
     pinMode(PIN_IR_RX, INPUT);
-    
-    // Setup PWM for IR transmission
-    ledcSetup(IR_PWM_CHANNEL, IR_FREQUENCY, 8);
-    ledcAttachPin(PIN_IR_TX, IR_PWM_CHANNEL);
-    ledcWrite(IR_PWM_CHANNEL, 0);  // Start with IR off
+    attachInterrupt(digitalPinToInterrupt(PIN_IR_RX), ir_rx_interrupt, CHANGE);
 }
 
-// Send IR pulse for a specific player ID
-void sendIR(int playerID) {
-    int pulseWidth = 0;
-    
-    // Determine pulse width based on player ID
-    switch (playerID) {
-        case 1:
-            pulseWidth = PLAYER1_PULSE_WIDTH;
-            break;
-        case 2:
-            pulseWidth = PLAYER2_PULSE_WIDTH;
-            break;
-        default:
-            return;  // Invalid player ID
+// Shooting logic
+void ir_shoot(int player_id) {
+    // Select pulse width based on player ID
+    int width = PLAYER1_PULSE_WIDTH;
+    if (player_id == 2) width = PLAYER2_PULSE_WIDTH;
+
+    // One shot per trigger press
+    // 38kHz signal for the duration of the pulse width
+    uint32_t t0 = micros();
+    while (micros() - t0 < width) {
+        digitalWrite(PIN_IR_TX, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(PIN_IR_TX, LOW);
+        delayMicroseconds(10);
     }
-    
-    // Send modulated IR pulse
-    ledcWrite(IR_PWM_CHANNEL, IR_DUTY_CYCLE);  // Turn on IR with carrier
-    delayMicroseconds(pulseWidth);
-    ledcWrite(IR_PWM_CHANNEL, 0);  // Turn off IR
 }
 
-// Receive and decode IR pulse, return player ID (0 if no valid pulse detected)
-int receiveIR() {
-    // Wait for IR signal to start (receiver goes HIGH when IR detected)
-    unsigned long timeout = micros() + 1000000;  // 1 second timeout
-    while (digitalRead(PIN_IR_RX) == LOW) {
-        if (micros() > timeout) return 0;  // Timeout, no signal
-    }
-    
-    // Measure pulse duration
-    unsigned long startTime = micros();
-    while (digitalRead(PIN_IR_RX) == HIGH) {
-        if (micros() - startTime > 5000) break;  // Max pulse 5ms
-    }
-    unsigned long pulseDuration = micros() - startTime;
-    
-    // Determine player ID based on pulse length
-    if (abs((long)pulseDuration - PLAYER1_PULSE_WIDTH) < 200) {
-        return 1;
-    } else if (abs((long)pulseDuration - PLAYER2_PULSE_WIDTH) < 200) {
-        return 2;
-    }
-    
-    return 0;  // No valid player ID
+bool ir_pulse_received() {
+    // True if a pulse has bveen recieved
+    return pulse_received;
+}
+
+int ir_read_pulse_width() {
+    // Clear recieved flag and return pulse width
+    pulse_received = false;
+    return pulse_width;
+}
+
+
+int ir_get_player_id() {
+    if (pulse_width == PLAYER1_PULSE_WIDTH) return 1;
+    if (pulse_width == PLAYER2_PULSE_WIDTH) return 2;
+    return 0; // Unknown player
 }
