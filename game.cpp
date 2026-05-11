@@ -3,7 +3,7 @@
 #include "display.h"
 #include "ir.h"
 #include "gyro.h"
-#include "wireless.h"
+//#include "wireless.h"
 #include "gpio.h"
 
 // Global player stats

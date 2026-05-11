@@ -1,5 +1,6 @@
 // Developed with the assistance of AI
 
+#include <Wire.h>
 #include "pins.h"
 #include "defs.h"
 
@@ -15,6 +16,8 @@ ty_game_state state = ST_INIT;
 
 void setup () {
     Serial.begin(115200);
+
+    Wire.begin(2, 1);
 
     Serial.println("Setup start");
 
@@ -58,6 +61,7 @@ void loop() {
         case ST_PLAY:
             game_update();
             if (game_over()) {
+                display_show("GAME OVER");
                 state = ST_GAME_OVER;
             }
             break;
