@@ -9,7 +9,7 @@
 #define PIN_IR_RX 11
 #define PIN_RUMBLE_MOTOR 36
 #define PIN_BUZZER 35
-#define DEBUG_SW 0
+#define PLAYER_SW 0
 
 #define STATUS_LED1 45
 #define STATUS_LED2 48

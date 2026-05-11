@@ -7,7 +7,7 @@
 #include "gyro.h"
 #include "game.h"
 #include "ir.h"
-#include "wireless.h"
+// #include "wireless.h"
 #include "gpio.h"
 
 // Starts from INIT state
@@ -16,12 +16,17 @@ ty_game_state state = ST_INIT;
 void setup () {
     Serial.begin(115200);
 
+    Serial.println("Setup start");
+
     gpio_init();
-    display_init();
+    status_leds();
+    display_start();
     ir_init();
-    gyro_init();
+    mpu_init();
     // wireless_init();
     game_init();
+
+    Serial.println("Setup end");
 
 
 }
@@ -58,7 +63,6 @@ void loop() {
             break;
 
         case ST_GAME_OVER:
-            game_over();
             state = ST_WAIT_START;
             break;
 

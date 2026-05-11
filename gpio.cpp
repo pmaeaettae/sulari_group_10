@@ -6,13 +6,16 @@ void gpio_init() {
     pinMode(PIN_TRIGGER, INPUT_PULLUP);
     pinMode(PIN_RELOAD, INPUT_PULLUP);
     pinMode(PIN_START, INPUT_PULLUP);
-    pinMode(DEBUG_SW, INPUT_PULLUP);
+    pinMode(PLAYER_SW, INPUT_PULLUP);
     pinMode(PIN_RUMBLE_MOTOR, OUTPUT);
     pinMode(PIN_BUZZER, OUTPUT);
 
     // Default off
     digitalWrite(PIN_RUMBLE_MOTOR, LOW);
     digitalWrite(PIN_BUZZER, LOW);
+    pinMode(STATUS_LED1, OUTPUT);
+    pinMode(STATUS_LED2, OUTPUT);
+    pinMode(STATUS_LED3, OUTPUT);
     digitalWrite(STATUS_LED1, LOW);
     digitalWrite(STATUS_LED2, LOW);
     digitalWrite(STATUS_LED3, LOW);
@@ -40,8 +43,14 @@ bool debug_mode_active() {
 
 // Get player ID
 int player_id() {
-    if (digitalRead(DEBUG_SW) == LOW) return 1;
-    else return 2;
+    // GPIO0 LOW  = Player 1
+    // GPIO0 HIGH = Player 2
+
+    if (digitalRead(PLAYER_SW) == LOW) {
+        return 1;
+    } else {
+        return 2;
+    }
 }
 
 // Update LEDs

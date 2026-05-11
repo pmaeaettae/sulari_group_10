@@ -5,5 +5,5 @@
 #define SCREEN_HEIGHT 64
 
 void display_start();
-void display_update();
-void display_show();
+void display_update(int ammo, int hp);
+void display_show(const char* msg);
