@@ -7,12 +7,12 @@ volatile uint32_t pulse_width = 0;
 volatile uint32_t pulse_start_time = 0;
 volatile bool pulse_received = false;
 
-static const uint32_t RX_MIN_PULSE_US = 1000;
-static const uint32_t RX_MAX_PULSE_US = 2000;
+static const uint32_t RX_MIN_PULSE_US = 800;
+static const uint32_t RX_MAX_PULSE_US = 2200;
 static const uint32_t RX_TOLERANCE_US = 150;
 static const uint32_t RX_LOCKOUT_MS = 100;
-static const uint32_t HEADER_WIDTH_US = 2400;
-static const uint32_t HEADER_TOLERANCE = 400;
+static const uint32_t HEADER_WIDTH_US = 4000;
+static const uint32_t HEADER_TOLERANCE = 500;
 
 static const uint32_t ir_pwm_freq = 38000;
 static const uint32_t ir_pwm_duty_cycle = 128; // 50% duty cycle
@@ -108,12 +108,9 @@ int ir_get_player_id() {
     pulse_received = false;
     interrupts();
 
-    if (recieved) {
-        Serial.printf("Received pulse width: %d us\n", width);
-    }
-    else return 0;
+    if (!recieved) return 0;
 
-    //if (!recieved) return 0;
+    Serial.printf("Received pulse width: %d us\n", width);
 
     uint32_t now_ms = millis();
     if (now_ms - last_valid_hit_ms < RX_LOCKOUT_MS) {

@@ -19,8 +19,8 @@ void display_start() {
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
-    display.setCursor(28, 30);
-    display.println("OLED OK");
+    display.setCursor(0, 30);
+    display.println("Waiting for players...");
     display.display();
 }
 
