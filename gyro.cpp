@@ -20,5 +20,5 @@ bool mpu_stationary() {
     long diff = abs(mag - previous);
     previous = mag;
 
-    return diff < 2000; // Note: fine tuning for this probably required
+    return diff < 5000; // Note: fine tuning for this probably required
 }

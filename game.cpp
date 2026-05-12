@@ -12,6 +12,31 @@ ty_player_stats player;
 // Static variables for timing
 static uint32_t last_shot_time = 0;
 
+// Wait until the player has stayed stationary for the full cooldown window.
+static void wait_for_respawn() {
+    uint32_t stationary_start = 0;
+
+    display_show("KO!");
+
+    while (true) {
+        // Check if player has stayed still for the full cooldown period to respawn
+        if (mpu_stationary()) {
+            if (stationary_start == 0) {
+                stationary_start = millis();
+            }
+
+            if (millis() - stationary_start >= DEATH_COOLDOWN) {
+                return;
+            }
+        } else {
+            stationary_start = 0;
+            display_show("Don't Move!");
+        }
+
+        delay(50);
+    }
+}
+
 // Initialize game and player stats
 void game_init() {
     player.id = player_id();
@@ -39,12 +64,10 @@ void game_update() {
     // Update player ID in case of changes
     player.id = player_id();
     
-    // Check for incoming shots
-    if (ir_pulse_received()) {
-        int hit_player_id = ir_get_player_id();
-        if (hit_player_id != 0 && hit_player_id != player.id) {
-            game_handle_hit(hit_player_id);
-        }
+    // Check for incoming shots (decoder consumes one pulse event)
+    int hit_player_id = ir_get_player_id();
+    if (hit_player_id != 0) {
+        game_handle_hit(hit_player_id);
     }
 
     // Update display with current stats
@@ -67,13 +90,6 @@ void game_update() {
         player.ammo = MAX_AMMO;
     }
 
-    // Player hits
-    if (ir_pulse_received()) {
-        int hit_player_id = ir_get_player_id();
-        if (hit_player_id != 0 && hit_player_id != player.id) {
-            game_handle_hit(hit_player_id);
-        }
-    }
 }
 
 // Hit handling
@@ -86,9 +102,9 @@ void game_handle_hit(int player_id) {
 
     if (player.hp <= 0) {
         player.deaths++;
+        // Player must stay still for the full cooldown period to respawn.
+        wait_for_respawn();
         player.hp = MAX_HP;
-        display_show("KO!");
-        delay(DEATH_COOLDOWN);
     }
 }
 
