@@ -24,15 +24,21 @@ void display_start() {
     display.display();
 }
 
-void display_update (int ammo, int hp) {
+void display_update (int ammo1, int hp1, int ammo2, int hp2) {
     display.clearDisplay();
     display.setTextColor(SSD1306_WHITE);
     
-    display.setCursor(10, 10);
-    display.printf("Ammo: %d", ammo);
+    display.setCursor(15, 5);
+    display.printf("P1: Ammo: %d", ammo1);
 
-    display.setCursor(28, 35);
-    display.printf("HP: %d", hp);
+    display.setCursor(30, 15);
+    display.printf("HP1: %d", hp1);
+
+    display.setCursor(15, 35);
+    display.printf("P2: Ammo: %d", ammo2);
+
+    display.setCursor(30, 45);
+    display.printf("HP2: %d", hp2);
 
     display.display();
 }

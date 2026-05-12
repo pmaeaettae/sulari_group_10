@@ -7,12 +7,12 @@ volatile uint32_t pulse_width = 0;
 volatile uint32_t pulse_start_time = 0;
 volatile bool pulse_received = false;
 
-static const uint32_t RX_MIN_PULSE_US = 800;
-static const uint32_t RX_MAX_PULSE_US = 2200;
-static const uint32_t RX_TOLERANCE_US = 150;
+static const uint32_t RX_MIN_PULSE_US = 900;
+static const uint32_t RX_MAX_PULSE_US = 2100;
+static const uint32_t RX_TOLERANCE_US = 100;
 static const uint32_t RX_LOCKOUT_MS = 100;
 static const uint32_t HEADER_WIDTH_US = 4000;
-static const uint32_t HEADER_TOLERANCE = 500;
+static const uint32_t HEADER_TOLERANCE = 300;
 
 static const uint32_t ir_pwm_freq = 38000;
 static const uint32_t ir_pwm_duty_cycle = 128; // 50% duty cycle
@@ -40,7 +40,7 @@ void IRAM_ATTR ir_rx_interrupt() {
             header_detected = true;
             last_header_time = now;
         } 
-        // Check if this is a Data pulse AND we just had a header
+        // Check if this is a IR pulse and a header was recognized
         else if (header_detected && (now - last_header_time < 5000)) { // 5ms timeout
             if (width >= RX_MIN_PULSE_US && width <= RX_MAX_PULSE_US) {
                 pulse_width = width;

@@ -14,15 +14,24 @@ typedef enum {
 
 // Game stats
 typedef struct {
-    int id;
-    int hp;
-    int deaths;
-    int hits;
-    int ammo;
-} ty_player_stats;
+    int id1;
+    int hp1;
+    int deaths1;
+    int hits1;
+    int ammo1;
+} ty_player_1_stats;
 
-// Global player stats
-extern ty_player_stats player;
+typedef struct {
+    int id2;
+    int hp2;
+    int deaths2;
+    int hits2;
+    int ammo2;
+} ty_player_2_stats;
+
+// Global player stats for both players.
+extern ty_player_1_stats player_1;
+extern ty_player_2_stats player_2;
 
 // Initialize game state and player stats
 void game_init();
