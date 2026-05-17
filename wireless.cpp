@@ -1,22 +1,26 @@
 #include "wireless.h"
 #include "game.h"
 #include "defs.h"
+#include "display.h"
 
 #include <WiFi.h>
+#include <PubSubClient.h>
 
-#define MQTT_BROKER = ""
-#define MQTT_PORT = 1883
-#define MQTT_ID = "group10_lasertag"
+#define MQTT_BROKER "localhost"
+#define MQTT_PORT 1883
+#define MQTT_ID "group10_lasertag"
 
-#define MQTT_STATS = "lasertag/stats"'
-#define MQTT_EVENTS = "lasertag/events"
+#define MQTT_STATS "lasertag/stats"
+#define MQTT_EVENTS "lasertag/events"
 
-#define WIFI_ID = ""
-#define WIFI_PASSWORD = ""
+#define WIFI_ID ""
+#define WIFI_PASSWORD ""
 
 // Connect to MQTT broker
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+
+uint32_t last_mqtt_reconnect = 0;
 
 
 // Initialize wifi and mqtt
@@ -28,9 +32,10 @@ void wireless_init() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print("Connecting...");
+        display_show("Connecting WiFi...");
     }
 
-    serial.println();
+    Serial.println();
 
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("WiFi connected");
@@ -61,7 +66,7 @@ void mqtt_stats() {
     }
 
     char message[256];
-    sprintf(message, sizeof(message), "{" "\"type\":\"stats\"," "\"p1\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d},"
+    snprintf(message, sizeof(message), "{" "\"type\":\"stats\"," "\"p1\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d},"
         "\"p2\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d}" "}",
         player_1.id1,
         player_1.hp1,
@@ -113,4 +118,23 @@ void mqtt_game_over () {
     Serial.println(message);
 
     mqtt_stats();
+}
+
+
+// Non blocking MQTT reconnect logic => try connection every 5 sec
+void mqtt_reconnect() {
+    if (mqttClient.connected()) {
+        return;
+    }
+
+    if (millis() - last_mqtt_reconnect > 5000) {
+        last_mqtt_reconnect = millis();
+        Serial.print("Connecting to MQTT...");
+        if (mqttClient.connect(MQTT_ID)) {
+            Serial.println("Connected");
+        } else {
+            Serial.print("Failed, state=");
+            Serial.println(mqttClient.state());
+        }
+    }
 }

@@ -9,7 +9,7 @@ import paho.mqtt.client as mqtt
 # https://www.geeksforgeeks.org/python/python-gui-tkinter/
 
 # MQTT settings
-MQTT_BROKER = ""  # Replace with your MQTT broker address
+MQTT_BROKER = "localhost"  # Replace with your MQTT broker address
 MQTT_PORT = 1883
 MQTT_TOPIC = "lasertag/stats"
 
