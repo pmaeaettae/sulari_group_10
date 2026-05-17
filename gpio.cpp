@@ -47,9 +47,9 @@ int player_id() {
     // GPIO0 HIGH = Player 2
 
     if (digitalRead(PLAYER_SW) == LOW) {
-        return 1;
-    } else {
         return 2;
+    } else {
+        return 1;
     }
 }
 

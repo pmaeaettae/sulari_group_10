@@ -26,7 +26,7 @@ void setup () {
     display_start();
     ir_init();
     mpu_init();
-    // wireless_init();
+    wireless_init();
     game_init();
 
     Serial.println("Setup end");
@@ -39,6 +39,7 @@ void loop() {
     // mqtt loop needed here!!
 
     status_leds();
+    mqtt_loop();
 
     switch (state) {
 
