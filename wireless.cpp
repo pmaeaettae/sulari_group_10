@@ -2,20 +2,20 @@
 #include "game.h"
 #include "defs.h"
 
-#include <Wifi.h>
+#include <WiFi.h>
 
-#define MQTT_BROKER = "192.168.1.159"
+#define MQTT_BROKER = ""
 #define MQTT_PORT = 1883
 #define MQTT_ID = "group10_lasertag"
 
 #define MQTT_STATS = "lasertag/stats"'
 #define MQTT_EVENTS = "lasertag/events"
 
-#define WIFI_ID = "sulkapallon_paluu"
-#define WIFI_PASSWORD = "turkinpippuri"
+#define WIFI_ID = ""
+#define WIFI_PASSWORD = ""
 
 // Connect to MQTT broker
-WifiClient espClient;
+WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 
@@ -25,7 +25,7 @@ void wireless_init() {
 
     WiFi.begin(WIFI_ID, WIFI_PASSWORD);
 
-    while (Wifi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print("Connecting...");
     }

@@ -8,7 +8,7 @@
 #include "gyro.h"
 #include "game.h"
 #include "ir.h"
-// #include "wireless.h"
+#include "wireless.h"
 #include "gpio.h"
 
 // Starts from INIT state
