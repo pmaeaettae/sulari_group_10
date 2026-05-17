@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 # https://pypi.org/project/paho-mqtt/
 # https://docs.python.org/3/library/tkinter.html
 # https://www.geeksforgeeks.org/python/python-gui-tkinter/
+# https://mosquitto.org/
 
 # MQTT settings
 MQTT_BROKER = "localhost"  # Replace with your MQTT broker address
@@ -48,11 +49,16 @@ refresh_scoreboard()
 
 # MQTT callbacks
 def on_connect(client, userdata, flags, reason_code, properties):
-    print(f"Connected with result code {reason_code}")
-    client.subscribe(MQTT_TOPIC)
+    if reason_code == 0:
+        print("Connected to MQTT Broker!")
+        client.subscribe(MQTT_TOPIC)
+        print(f"Subscribed to topic: {MQTT_TOPIC}")
+    else:
+        print(f"Failed to connect, reason code {reason_code}")
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
+    print(f"Received message: {payload}")
     data = json.loads(payload)
 
     if "p1" in data:
@@ -68,7 +74,7 @@ def on_message(client, userdata, msg):
     root.after(0, refresh_scoreboard)
 
 # MQTT setup
-client = mqtt.Client()
+client = mqtt.Client(client_id="group10_lasertag", protocol=mqtt.MQTTv5)
 client.on_connect = on_connect
 client.on_message = on_message
 
