@@ -18,7 +18,7 @@ static void wait_for_respawn() {
     uint32_t stationary_start = 0;
 
     display_show("KO!");
-
+    delay(8000);
     while (true) {
         // Check if player has stayed still for the full cooldown period to respawn
         if (mpu_stationary()) {
@@ -168,4 +168,5 @@ bool game_over() {
 // Debug mode
 void debug_mode() {
     display_show("DEBUG MODE");
+    // Debug functions can be added here, such as simulating hits or displaying sensor data
 }
