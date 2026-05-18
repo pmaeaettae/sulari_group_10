@@ -26,7 +26,7 @@ void setup () {
     display_start();
     ir_init();
     mpu_init();
-    //wireless_init();
+    wireless_init();
     game_init();
 
     Serial.println("Setup end");
@@ -39,7 +39,7 @@ void loop() {
     // mqtt loop needed here!!
 
     status_leds();
-    //mqtt_loop();
+    mqtt_loop();
 
     switch (state) {
 
@@ -73,7 +73,7 @@ void loop() {
 
         case ST_DEBUG:
             debug_mode();
-            if (!debug_mode_active()) {
+            if (debug_mode_active()) {
                 state = ST_WAIT_MODE;
             }
             break;

@@ -3,7 +3,7 @@
 #include "display.h"
 #include "ir.h"
 #include "gyro.h"
-//#include "wireless.h"
+#include "wireless.h"
 #include "gpio.h"
 
 // Global player stats
@@ -81,6 +81,7 @@ void game_update() {
     int hit_player_id = ir_get_player_id();
     if (hit_player_id != 0) {
         game_handle_hit(hit_player_id);
+        mqtt_stats();
     }
 
     // Update display with current stats
@@ -95,6 +96,7 @@ void game_update() {
                         player_1.ammo1--;
                         last_shot_time = millis();
                         buzzer(50);
+                        mqtt_stats();
                     }
                 } else if (current_player == 2) {
                     if (player_2.ammo2 > 0) {
@@ -102,6 +104,7 @@ void game_update() {
                         player_2.ammo2--;
                         last_shot_time = millis();
                         buzzer(50);
+                        mqtt_stats();
                     }
                 }
             }

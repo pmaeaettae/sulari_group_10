@@ -6,15 +6,15 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-#define MQTT_BROKER "localhost"
+#define MQTT_BROKER "your IP"
 #define MQTT_PORT 1883
-#define MQTT_ID "group10_lasertag"
+#define MQTT_ID "group10_lasertag_esp32_client"
 
 #define MQTT_STATS "lasertag/stats"
 #define MQTT_EVENTS "lasertag/events"
 
-#define WIFI_ID ""
-#define WIFI_PASSWORD ""
+#define WIFI_ID "Your WiFi ID"
+#define WIFI_PASSWORD "Your WiFi Password"
 
 // Connect to MQTT broker
 WiFiClient espClient;
@@ -32,7 +32,6 @@ void wireless_init() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print("Connecting...");
-        display_show("Connecting WiFi...");
     }
 
     Serial.println();
@@ -53,6 +52,7 @@ void mqtt_loop() {
     if (WiFi.status() != WL_CONNECTED) {
     return;
     }
+    mqtt_reconnect();
 
     if (mqttClient.connected()) {
         mqttClient.loop();
@@ -66,19 +66,25 @@ void mqtt_stats() {
     }
 
     char message[256];
-    snprintf(message, sizeof(message), "{" "\"type\":\"stats\"," "\"p1\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d},"
-        "\"p2\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d}" "}",
-        player_1.id1,
-        player_1.hp1,
-        player_1.deaths1,
-        player_1.hits1,
-        player_1.ammo1,
-        player_2.id2,
-        player_2.hp2,
-        player_2.deaths2,
-        player_2.hits2,
-        player_2.ammo2
-    );
+snprintf(
+    message,
+    sizeof(message),
+    "{"
+    "\"type\":\"stats\","
+    "\"p1\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d},"
+    "\"p2\":{\"id\":%d,\"hp\":%d,\"deaths\":%d,\"hits\":%d,\"ammo\":%d}"
+    "}",
+    player_1.id1,
+    player_1.hp1,
+    player_1.deaths1,
+    player_1.hits1,
+    player_1.ammo1,
+    player_2.id2,
+    player_2.hp2,
+    player_2.deaths2,
+    player_2.hits2,
+    player_2.ammo2
+);
 
     mqttClient.publish(MQTT_STATS, message);
 
@@ -99,19 +105,19 @@ void mqtt_game_over () {
     }
 
     char message[256];
-        snprintf(
+    snprintf(
         message,
         sizeof(message),
         "{"
-        "\"game_over\","
+        "\"game_over\":true,"
         "\"winner\":%d,"
         "\"p1_deaths\":%d,"
         "\"p2_deaths\":%d"
         "}",
         winner,
-        player_1.deaths1,
-        player_2.deaths2
-    );
+    player_1.deaths1,
+    player_2.deaths2
+);
 
     mqttClient.publish(MQTT_EVENTS, message);
     Serial.print("Game over ");

@@ -13,6 +13,7 @@ import paho.mqtt.client as mqtt
 MQTT_BROKER = "localhost"  # Replace with your MQTT broker address
 MQTT_PORT = 1883
 MQTT_TOPIC = "lasertag/stats"
+MQTT_CLIENT_ID = "group10_lasertag_ui"
 
 # Player data
 players = {
@@ -57,24 +58,29 @@ def on_connect(client, userdata, flags, reason_code, properties):
         print(f"Failed to connect, reason code {reason_code}")
 
 def on_message(client, userdata, msg):
-    payload = msg.payload.decode()
+    payload = msg.payload.decode(errors="replace")
     print(f"Received message: {payload}")
-    data = json.loads(payload)
+
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON payload: {exc}")
+        return
 
     if "p1" in data:
-        players["Player 1"]["HP"] = data["p1"]["hp"]
-        players["Player 1"]["KO"] = data["p1"]["deaths"]
-        players["Player 1"]["Hits"] = data["p1"]["hits"]
+        players["Player 1"]["HP"] = data["p1"].get("hp", players["Player 1"]["HP"])
+        players["Player 1"]["KO"] = data["p1"].get("deaths", players["Player 1"]["KO"])
+        players["Player 1"]["Hits"] = data["p1"].get("hits", players["Player 1"]["Hits"])
 
     if "p2" in data:
-        players["Player 2"]["HP"] = data["p2"]["hp"]
-        players["Player 2"]["KO"] = data["p2"]["deaths"]
-        players["Player 2"]["Hits"] = data["p2"]["hits"]
+        players["Player 2"]["HP"] = data["p2"].get("hp", players["Player 2"]["HP"])
+        players["Player 2"]["KO"] = data["p2"].get("deaths", players["Player 2"]["KO"])
+        players["Player 2"]["Hits"] = data["p2"].get("hits", players["Player 2"]["Hits"])
 
     root.after(0, refresh_scoreboard)
 
 # MQTT setup
-client = mqtt.Client(client_id="group10_lasertag", protocol=mqtt.MQTTv5)
+client = mqtt.Client(client_id=MQTT_CLIENT_ID, protocol=mqtt.MQTTv5)
 client.on_connect = on_connect
 client.on_message = on_message
 
